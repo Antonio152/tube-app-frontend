@@ -1,0 +1,36 @@
+.mainContainer{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    font-family: "Arial, sans-serif";
+
+    input{
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    button{
+        margin: 10px 0;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        background-color: #007BFF;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+
+        &:hover{
+            background-color: #0056b3;
+        }
+    }
+
+    .error{
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+}
