@@ -6,27 +6,44 @@ function App() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [format, setFormat] = useState("mp4");
 
+  /* This function is for serverless  */
   const handleDownload = async () => {
     setError("");
     setLoading(true);
-
+    // Serverless netlify function
+    //https://tube-app-backend.netlify.app/.netlify/functions/serverless_netlify
     try {
       const response = await axios.get(
-        'https://tube-app-backend.netlify.app/.netlify/functions/download', //https://tube-app-backend.netlify.app/.netlify/functions/download
+        'https://tube-app-backend.netlify.app/.netlify/functions/download_v2', //'http://localhost:8888/.netlify/functions/serverless_netlify
         {
-          params: { url },
-          responseType: "blob", // Para descargar como archivo
+          params: { url, format },
+          responseType: "blob",
         }
       );
-
-      // Crear link para descarga
+  
+      // Obtener el nombre desde Content-Disposition
+      const contentDisposition = response.headers['content-disposition'];
+       
+      console.log(response)
+      let filename = contentDisposition || "video.mp4";
+  
+      const match = contentDisposition?.match(/filename="(.+?)"/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
+  
       const blob = new Blob([response.data]);
       const downloadUrl = window.URL.createObjectURL(blob);
+  
       const a = document.createElement("a");
       a.href = downloadUrl;
-      a.download = "video.mp4"; // o .mp3 según tu backend
+      a.download = filename;
+      document.body.appendChild(a);
       a.click();
+      a.remove();
+  
       window.URL.revokeObjectURL(downloadUrl);
     } catch (err) {
       setError("Ocurrió un error al descargar el video.");
@@ -35,6 +52,7 @@ function App() {
       setLoading(false);
     }
   };
+  
 
   return (
     <>
@@ -48,6 +66,12 @@ function App() {
           id="" 
           onChange={(e) => setUrl(e.target.value)}
         />
+        <div>
+          <select onChange={(e) => setFormat(e.target.value)} value={format}>
+            <option value="mp4">MP4</option>
+            <option value="mp3">MP3</option>
+          </select>
+        </div>
         <button onClick={handleDownload}>{loading ? "Descargando..." : "Descargar"}</button>
         {error && <p className={styles.error}>{error}</p>}
       </div>
